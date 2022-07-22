@@ -1,32 +1,32 @@
-﻿// See https://aka.ms/new-console-template for more information
-using BingoWithoutUI;
+﻿using BingoWithoutUI;
 
 const int POINTS_FOR_ROW = 100;
 
-BingoCard card = new BingoCard(5,3);
-BingoGame game = new BingoGame(60);
+IBingoCard card = new BingoCard(3,5);
+IBingoGame game = new BingoGame(60);
 
 card.GenerateBingoCardNumbers(60);
 var drawnBalls = game.DrawBalls();
 
-Debug();
+DisplayNumbers();
 CheckScore();
 
-void Debug()
+void DisplayNumbers()
 {
     var cardNumbers = card.Get_TwoDimensionalNumberArray();
 
-    for (int i = 0; i < cardNumbers.GetLength(0); i++)
+    Console.WriteLine("--Your bingo card--");
+
+    for (int row = 0; row < cardNumbers.GetLength(0); row++)
     {
-        for (int j = 0; j < cardNumbers.GetLength(1); j++)
+        for (int column = 0; column < cardNumbers.GetLength(1); column++)
         {
-            Console.Write(String.Format("{0}\t", cardNumbers[i, j]));
+            Console.Write(String.Format("{0}\t", cardNumbers[row, column]));
         }
         Console.WriteLine();
     }
 
-    Console.WriteLine("LETS DRAW SOME BALLZ");
-
+    Console.WriteLine("--Drawing numbers--");
 
     for (int i = 0; i < drawnBalls.Count; i++)
     {
@@ -42,51 +42,38 @@ void Debug()
 void CheckScore()
 {
     var cardNumbers = card.Get_TwoDimensionalNumberArray();
-    int j = 0;
+    int column = 0;
     int howManyNumbersHaveMatched = 0;
     int howManyRowNumbersHaveMatched = 0 ;
+    int size_of_a_card = card.GetSizeOfACard();
 
-
-    for (int i = 0; i < cardNumbers.GetLength(0); i++)
+    for (int row = 0; row < cardNumbers.GetLength(0); row++)
     {
-        while (j < cardNumbers.GetLength(1))
+        while (column < cardNumbers.GetLength(1))
         {
-            if (drawnBalls.Contains(cardNumbers[i,j]))
+            if (drawnBalls.Contains(cardNumbers[row, column]))
             {
-                Console.WriteLine("Matched one!, Continue {0}", cardNumbers[i, j]);
                 howManyRowNumbersHaveMatched++;
                 howManyNumbersHaveMatched++;
             }
-            j++;
+            column++;
         }
 
-        if (howManyRowNumbersHaveMatched == 5)
+        if (howManyRowNumbersHaveMatched == cardNumbers.GetLength(1))
         {
-            AddPointsForRow();
+            card.AddPoints(POINTS_FOR_ROW);
             howManyRowNumbersHaveMatched = 0;
-            Console.WriteLine(card.points);
         }
-        else if(howManyNumbersHaveMatched == 15)
+        else if(howManyNumbersHaveMatched == size_of_a_card)
         {
-            SetMaxPoints();
-            Console.WriteLine(card.points);
+            card.SetMaxPoints();
         }
         else
         {
             howManyRowNumbersHaveMatched = 0;
-            j = 0;
+            column = 0;
         }
-        Console.WriteLine();
     }
-}
-
-void AddPointsForRow()
-{
-    card.AddPoints(POINTS_FOR_ROW);
-}
-
-void SetMaxPoints()
-{
-    card.SetMaxPoints();
+    Console.WriteLine("Your score: " + card.GetPoints());
 }
 

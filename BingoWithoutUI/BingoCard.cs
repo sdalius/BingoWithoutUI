@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BingoWithoutUI
+﻿namespace BingoWithoutUI
 {
-    public class BingoCard
+    public class BingoCard : IBingoCard
     {
         const int BALLS_SMALLEST_NUMBER = 1;
 
-        public int points;
+        const int MAX_POINTS = 1500;
+        public int points { get; private set; }
         public int rows { get; private set; }
         public int columns { get; private set; }
 
-        int[] number_array;
-        int[,] Two_Dimensional_number_array;
+        int[] generated_numbers_for_card;
 
-        public BingoCard ( int columns, int rows)
+        int[,] Two_Dimensional_generated_numbers_for_card;
+
+        public BingoCard(int rows, int columns)
         {
             this.rows = rows;
             this.columns = columns;
@@ -26,7 +22,15 @@ namespace BingoWithoutUI
 
         public int[,] Get_TwoDimensionalNumberArray()
         {
-            return Two_Dimensional_number_array;
+            return Two_Dimensional_generated_numbers_for_card;
+        }
+        public int GetSizeOfACard()
+        {
+            return rows * columns;
+        }
+        public void SetMaxPoints()
+        {
+            this.points = MAX_POINTS;
         }
 
         public void AddPoints(int points)
@@ -34,30 +38,31 @@ namespace BingoWithoutUI
             this.points += points;
         }
 
-        public void SetMaxPoints()
+        public int GetPoints()
         {
-            this.points = 1500;
+            return points;
         }
+
         public void GenerateBingoCardNumbers(int max_number)
         {
             int size_of_a_card = rows * columns;
             
             Random random = new Random();
-            Two_Dimensional_number_array = new int[rows, columns];
 
-            number_array = Enumerable.Range(1, max_number)
+            Two_Dimensional_generated_numbers_for_card = new int[rows, columns];
+
+            generated_numbers_for_card = Enumerable.Range(1, max_number)
                             .OrderBy(query => random.Next(BALLS_SMALLEST_NUMBER, max_number)).Take(size_of_a_card)
-                            .Distinct()
                             .ToArray()
                             .OrderBy(i => i)
                             .ToArray();
 
 
-            for (int i = 0; i < Two_Dimensional_number_array.GetLength(0); i++)
+            for (int column = 0; column < Two_Dimensional_generated_numbers_for_card.GetLength(1); column++)
             {
-                for (int j = 0; j < Two_Dimensional_number_array.GetLength(1); j++)
+                for (int row = 0; row < Two_Dimensional_generated_numbers_for_card.GetLength(0); row++)
                 {
-                    Two_Dimensional_number_array[i, j] = number_array[i * columns + j];
+                    Two_Dimensional_generated_numbers_for_card[row, column] = generated_numbers_for_card[column * rows + row];
                 }
             }
         }
